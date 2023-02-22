@@ -1,52 +1,105 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 using Mission6.Models;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Mission6.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
         private MovieDbContext MovieContext { get; set; }
-        public HomeController(ILogger<HomeController> logger, MovieDbContext movie)
+        public HomeController(MovieDbContext movie)
         {
-            _logger = logger;
             MovieContext = movie;
         }
 
+        //Create the Index controller
         public IActionResult Index()
         {
             return View();
         }
 
+        //Create the MyPodcasts controller
         public IActionResult MyPodcasts()
         {
             return View();
         }
 
+        //Create the MovieForm get controller
         [HttpGet]
         public IActionResult MovieForm()
         {
+            ViewBag.Categories = MovieContext.Categories.ToList();
+
             return View();
         }
 
+        //Create the MovieForm post controller
         [HttpPost]
         public IActionResult MovieForm(FormResponse response)
         {
-            MovieContext.Add(response);
-            MovieContext.SaveChanges();
-            return View("ConfirmationPage");
+            if (ModelState.IsValid)
+            {
+                MovieContext.Add(response);
+                MovieContext.SaveChanges();
+                return View("ConfirmationPage");
+            }
+            else
+            {
+                ViewBag.Categories = MovieContext.Categories.ToList();
+
+                return View(response);
+            }
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        //Create the MovieList controller
+        public IActionResult MovieList()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var Movies = MovieContext.responses
+                .Include(x => x.Category)
+                .OrderBy(x => x.Category)
+                .ToList();
+
+            return View(Movies);
+        }
+
+        //Create the Edit get controller
+        [HttpGet]
+        public IActionResult Edit(int applicationid)
+        {
+            ViewBag.Categories = MovieContext.Categories.ToList();
+
+            var Movie = MovieContext.responses.Single(x => x.ApplicationId == applicationid);
+
+            return View("MovieForm", Movie);
+        }
+
+        //Create the Edit post controller
+        [HttpPost]
+        public IActionResult Edit(FormResponse movieresponse)
+        {
+            MovieContext.Update(movieresponse);
+            MovieContext.SaveChanges();
+
+            return RedirectToAction("MovieList");
+        }
+
+        //Create the Delete get controller
+        [HttpGet]
+        public IActionResult Delete(int applicationid)
+        {
+            var Movie = MovieContext.responses.Single(x => x.ApplicationId == applicationid);
+
+            return View(Movie);
+        }
+
+        //Create the Delete post controller
+        [HttpPost]
+        public IActionResult Delete(FormResponse response)
+        {
+            MovieContext.responses.Remove(response);
+            MovieContext.SaveChanges();
+            return RedirectToAction("MovieList");
         }
     }
 }

@@ -15,15 +15,70 @@ namespace Mission6.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.1.32");
 
+            modelBuilder.Entity("Mission6.Models.Category", b =>
+                {
+                    b.Property<int>("CategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("CategoryId");
+
+                    b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            CategoryId = 1,
+                            CategoryName = "Action/Adventure"
+                        },
+                        new
+                        {
+                            CategoryId = 2,
+                            CategoryName = "Comedy"
+                        },
+                        new
+                        {
+                            CategoryId = 3,
+                            CategoryName = "Drama"
+                        },
+                        new
+                        {
+                            CategoryId = 4,
+                            CategoryName = "Family"
+                        },
+                        new
+                        {
+                            CategoryId = 5,
+                            CategoryName = "Horror/Suspense"
+                        },
+                        new
+                        {
+                            CategoryId = 6,
+                            CategoryName = "Miscellaneous"
+                        },
+                        new
+                        {
+                            CategoryId = 7,
+                            CategoryName = "Television"
+                        },
+                        new
+                        {
+                            CategoryId = 8,
+                            CategoryName = "VHS"
+                        });
+                });
+
             modelBuilder.Entity("Mission6.Models.FormResponse", b =>
                 {
                     b.Property<int>("ApplicationId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Director")
                         .IsRequired()
@@ -51,13 +106,15 @@ namespace Mission6.Migrations
 
                     b.HasKey("ApplicationId");
 
+                    b.HasIndex("CategoryId");
+
                     b.ToTable("responses");
 
                     b.HasData(
                         new
                         {
                             ApplicationId = 1,
-                            Category = "Action/Adventure",
+                            CategoryId = 1,
                             Director = "Joe Russo",
                             Edited = false,
                             Rating = "PG-13",
@@ -67,7 +124,7 @@ namespace Mission6.Migrations
                         new
                         {
                             ApplicationId = 2,
-                            Category = "Romance/Comedy",
+                            CategoryId = 2,
                             Director = "Donald Petrie",
                             Edited = false,
                             Rating = "PG-13",
@@ -77,13 +134,22 @@ namespace Mission6.Migrations
                         new
                         {
                             ApplicationId = 3,
-                            Category = "Action/Romance",
+                            CategoryId = 1,
                             Director = "Aaron and Adam Nee",
                             Edited = false,
                             Rating = "PG-13",
                             Title = "The Lost City",
                             Year = 2022
                         });
+                });
+
+            modelBuilder.Entity("Mission6.Models.FormResponse", b =>
+                {
+                    b.HasOne("Mission6.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

@@ -6,12 +6,14 @@ namespace Mission6.Models
 {
     public class FormResponse
     {
+        //Add all of the columns we need for the form and add validation
         [Key]
         [Required]
         public int ApplicationId { get; set; }
 
-        [Required]
-        public string Category { get; set; }
+        [Required(ErrorMessage = "Category selection is invalid")]
+        public int CategoryId { get; set; }
+        public Category Category { get; set; }
 
         [Required]
         public string Title { get; set; }
@@ -23,7 +25,7 @@ namespace Mission6.Models
 
         public int Year { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Rating selection is invalid")]
 
         public string Rating { get; set; }
 
